@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIRCÉ PARIS | Cosmétique Sur-Mesure</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;italic&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'circe-cream': '#F9F7F2',
+                        'circe-khaki': '#3A4234',
+                        'circe-khaki-light': '#515B49',
+                        'circe-gold': '#B39E6D',
+                        'circe-gray': '#EAE7E0',
+                        'circe-dark': '#1A1A1A'
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                        signature: ['"Playfair Display"', 'serif'],
+                    },
+                    boxShadow: {
+                        'luxury': '0 10px 40px -10px rgba(58, 66, 52, 0.1)',
+                    },
+                    animation: {
+                        'marquee': 'marquee 30s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #3A4234;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F9F7F2; }
+        ::-webkit-scrollbar-thumb { background: #EAE7E0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #B39E6D; }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .slide-up { animation: slideUp 0.6s ease-out forwards; }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* Radio Buttons cachés */
+        input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Cartes d'options cliquables */
+        .option-card {
+            border: 1px solid #EAE7E0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+        .option-card:hover {
+            border-color: #B39E6D;
+            background-color: #FDFCF8;
+        }
+        input[type="radio"]:checked + .option-card {
+            border-color: #3A4234;
+            background-color: #FDFCF8;
+            box-shadow: 0 4px 15px rgba(58, 66, 52, 0.05);
+        }
+        
+        /* Indicateur de sélection radio */
+        .radio-indicator {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #B39E6D;
+            display: inline-block;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        input[type="radio"]:checked + .option-card .radio-indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background-color: #3A4234;
+        }
+
+        /* Champ texte Prénom */
+        .input-premium {
+            border: none;
+            border-bottom: 1px solid #EAE7E0;
+            background: transparent;
+            border-radius: 0;
+            padding: 10px 0;
+            transition: all 0.3s ease;
+        }
+        .input-premium:focus {
+            outline: none;
+            border-bottom-color: #3A4234;
+            box-shadow: 0 1px 0 0 #3A4234;
+        }
+        .input-error {
+            border-bottom-color: #ef4444 !important;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Design de l'étiquette dynamique */
+        .dynamic-label {
+            background-color: #FDFCF8;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border: 1px solid rgba(179, 158, 109, 0.2);
+            position: relative;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+        }
+        .dynamic-label::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 1px solid #3A4234;
+            pointer-events: none;
+        }
+
+        /* Toast notification */
+        #toast {
+            opacity: 0;
+            transform: translate(-50%, 100px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased min-h-screen flex flex-col bg-circe-cream">
+
+    <header class="w-full fixed top-0 z-50 bg-circe-cream/90 backdrop-blur-md border-b border-circe-gray/80 h-[88px]">
+        <nav class="h-full px-6 md:px-12 flex justify-between items-center max-w-[1600px] mx-auto">
+            <div class="hidden md:flex gap-6 text-sm font-medium tracking-widest uppercase">
+                <a href="#hero-gallery" class="text-circe-khaki font-bold border-b border-circe-khaki pb-1">La Maison</a>
+                <a href="#sur-mesure" class="hover:text-circe-gold transition-colors">Sur-Mesure</a>
+            </div>
+            
+            <div class="text-center absolute left-1/2 transform -translate-x-1/2">
+                <h1 class="font-serif text-3xl md:text-4xl tracking-[0.2em] font-semibold text-circe-khaki uppercase">Circé</h1>
+                <p class="text-[10px] tracking-widest uppercase font-sans mt-1">Paris</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="open-cart-btn" class="hover:text-circe-gold transition-colors relative">
+                    <i class="ph ph-bag text-2xl"></i>
+                    <span class="absolute -top-1 -right-2 bg-circe-khaki text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold transition-all duration-300" id="cart-count">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Le paddingTop de 88px compense la hauteur fixe du header -->
+    <main class="flex-grow pt-[88px] flex flex-col w-full">
+        
+        <!-- SECTION 1 : Hero (Image Unique) -->
+        <section id="hero-gallery" class="w-full relative h-[70vh] md:h-[85vh] overflow-hidden bg-circe-dark border-b border-circe-dark">
+            <!-- Image de fond unique -->
+            <img src="Circébobo.jpeg" alt="Flacon Circé" class="absolute inset-0 w-full h-full object-cover object-center opacity-70 transition-transform duration-1000 hover:scale-105">
+            
+            <!-- Superposition texte centrée -->
+            <div class="absolute inset-0 flex flex-col justify-center items-center text-center p-8 md:p-12 z-10 bg-black/30">
+                <h2 class="font-serif text-5xl md:text-7xl lg:text-8xl text-circe-cream tracking-widest mb-4 drop-shadow-xl slide-up">SUR-MESURE</h2>
+                <p class="font-sans text-[10px] md:text-xs tracking-[0.25em] uppercase text-circe-cream mb-10 drop-shadow-md fade-in">Le rituel de volupté pour votre peau</p>
+                <a href="#sur-mesure" class="border border-circe-cream bg-transparent text-circe-cream px-10 py-4 text-[10px] md:text-xs font-semibold tracking-widest uppercase hover:bg-circe-cream hover:text-circe-khaki transition-all duration-300 fade-in">
+                    Créer ma formule
+                </a>
+            </div>
+        </section>
+
+        <!-- SECTION 2 : A Propos (L'histoire) -->
+        <section id="a-propos" class="w-full bg-circe-cream py-24 px-6 md:px-12 border-b border-circe-gray/50">
+            <article class="max-w-4xl mx-auto flex flex-col items-center text-center">
+                <h2 class="font-serif text-3xl md:text-5xl lg:text-6xl text-circe-khaki mb-12 tracking-wide leading-tight">
+                    Le droit d'être coquette,<br>
+                    <span class="text-circe-khaki italic font-light">sans compromis.</span>
+                </h2>
+                
+                <div class="space-y-6 text-sm md:text-base text-circe-khaki-light leading-relaxed font-sans max-w-2xl text-justify md:text-center">
+                    <p>Pendant longtemps, le moment de la douche n'était pas un plaisir pour moi, mais une appréhension.</p>
+                    <p>Vivant avec de l'eczéma, ma peau a toujours dicté ses règles. J'étais condamnée aux rayons des pharmacies et à leurs flacons cliniques, blancs, sans odeur ni personnalité. Ma peau était apaisée, mais ma féminité, elle, était frustrée. Pourquoi, sous prétexte d'avoir une peau atopique, devais-je sacrifier le plaisir et l'élégance ?</p>
+                    <p class="font-medium text-circe-khaki text-center text-lg mt-4 mb-4">Prendre soin de soi ne devrait jamais ressembler à une ordonnance médicale.</p>
+                    <p>C'est de ce refus qu'est née CIRCÉ. J'ai imaginé la cosmétique qui me manquait : des formules sur-mesure, d'une douceur absolue pour les épidermes capricieux, mais qui redonnent à la salle de bain ses lettres de noblesse. Des textures gourmandes, des parfums délicats, et des flacons que l'on est enfin fière d'exposer.</p>
+                    
+                    <blockquote class="font-serif text-2xl md:text-3xl text-circe-khaki italic mt-10 mb-8 border-y border-circe-gray/50 py-8">
+                        "Avec CIRCÉ, la douche redevient ce qu'elle n'aurait jamais dû cesser d'être : un instant si spécial, un rituel de volupté."
+                    </blockquote>
+                </div>
+
+                <div class="mt-8 flex flex-col items-center">
+                    <p class="font-signature text-2xl md:text-3xl text-circe-khaki">Annette Okoronkwo</p>
+                    <p class="font-sans text-[10px] tracking-widest uppercase text-circe-khaki-light mt-2">Fondatrice de CIRCÉ</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- SECTION 3 : Sur-Mesure (Customizer en 2 colonnes) -->
+        <section id="sur-mesure" class="w-full bg-circe-cream">
+            <div class="max-w-[1600px] mx-auto w-full grid grid-cols-1 md:grid-cols-2">
+                
+                <!-- Colonne Gauche : Étiquette (Fixée/Sticky sur Desktop) -->
+                <div class="relative bg-circe-cream">
+                    <!-- Conteneur avec sticky et hauteur calculée pour centrer l'étiquette verticalement -->
+                    <div class="md:sticky md:top-[88px] md:h-[calc(100vh-88px)] flex items-center justify-center p-4 sm:p-8 md:p-6 lg:p-16">
+                        
+                        <div class="dynamic-label w-full max-w-sm aspect-[3/4] p-8 md:p-10 flex flex-col items-center justify-between text-center shadow-xl">
+                            <div class="mt-2">
+                                <h2 class="font-serif text-4xl tracking-[0.25em] font-semibold text-circe-khaki mb-2">C I R C É</h2>
+                                <p class="font-serif text-xs uppercase tracking-widest text-circe-khaki-light mb-8">Paris</p>
+                                <p class="font-sans text-[11px] uppercase tracking-widest text-circe-khaki-light">Cosmétique Sur-Mesure</p>
+                                <p class="font-sans text-[11px] uppercase tracking-[0.2em] text-circe-gold mt-2">Cuvée Botanique</p>
+                            </div>
+
+                            <div class="my-6 w-full">
+                                <p class="font-serif text-base font-semibold tracking-wider text-circe-khaki uppercase mb-4 border-b border-gray-200 pb-2 inline-block">
+                                    Formulé spécialement<br>pour <span id="preview-name" class="text-circe-gold">...</span>
+                                </p>
+                                
+                                <div class="font-sans text-sm text-circe-khaki-light mt-4">
+                                    <p class="font-semibold text-circe-khaki tracking-widest text-[11px] mb-3">LA RECETTE N°1</p>
+                                    <p id="preview-base" class="mb-1 transition-all">Sélectionnez une base</p>
+                                    <p id="preview-actif" class="mb-1 transition-all">Sélectionnez un actif</p>
+                                    <p id="preview-parfum" class="transition-all">Sélectionnez un parfum</p>
+                                </div>
+                            </div>
+
+                            <div class="w-full mb-2">
+                                <p class="font-sans text-sm tracking-widest mb-3">150 ml ℮</p>
+                                <p class="font-sans text-[7px] leading-tight text-gray-400 text-justify">
+                                    <span id="preview-inci">INCI: Aqua, Base Neutre...</span><br>
+                                    Fabriqué en France - Lot: C-001 - 6M
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Colonne Droite : Formulaire interactif -->
+                <div class="flex flex-col justify-center p-6 sm:p-8 md:p-10 lg:p-20 bg-circe-cream">
+                    <div class="w-full max-w-md mx-auto">
+                        
+                        <!-- Navigation du formulaire -->
+                        <div class="flex items-center justify-between mb-12 md:mb-16 text-[10px] md:text-xs font-semibold tracking-widest uppercase text-gray-300">
+                            <span id="nav-step-1" class="text-circe-khaki border-b-2 border-circe-khaki pb-1">1. Texture</span>
+                            <span id="nav-step-2" class="pb-1 border-b-2 border-transparent">2. Propriété</span>
+                            <span id="nav-step-3" class="pb-1 border-b-2 border-transparent">3. Parfum</span>
+                            <span id="nav-step-4" class="pb-1 border-b-2 border-transparent">4. Signature</span>
+                        </div>
+
+                        <!-- Étapes du formulaire -->
+                        <div id="step-container" class="relative min-h-[380px]">
+                            
+                            <!-- Étape 1 -->
+                            <div id="step-1" class="w-full fade-in">
+                                <h3 class="font-serif text-3xl text-circe-khaki mb-2">La Texture</h3>
+                                <p class="font-sans text-sm text-circe-khaki-light mb-8">Choisissez la base de votre rituel lavant.</p>
+                                <div class="space-y-4">
+                                    <label class="block relative">
+                                        <input type="radio" name="base" value="Base Lavante Douce" data-inci="Aqua, Sodium Coco-Sulfate, Cocamidopropyl Betaine">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Gel Doux Quotidien</h4>
+                                                <p class="text-xs text-gray-500">Base lavante neutre BIO respectueuse du pH de votre peau.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                    <label class="block relative">
+                                        <input type="radio" name="base" value="Gel Exfoliant Perles" data-inci="Aqua, Sodium Coco-Sulfate, Jojoba Esters">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Gel Exfoliant aux Perles</h4>
+                                                <p class="text-xs text-gray-500">Enrichi en perles de Jojoba naturelles pour un gommage délicat.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Étape 2 -->
+                            <div id="step-2" class="w-full hidden">
+                                <h3 class="font-serif text-3xl text-circe-khaki mb-2">La Propriété</h3>
+                                <p class="font-sans text-sm text-circe-khaki-light mb-8">Ciblez le besoin spécifique de votre épiderme.</p>
+                                <div class="space-y-4">
+                                    <label class="block relative">
+                                        <input type="radio" name="actif" value="Boost Hydratation Absolue" data-inci=", Sodium Hyaluronate">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Boost Hydratation</h4>
+                                                <p class="text-xs text-gray-500">Acide Hyaluronique pur pour repulper l'épiderme.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                    <label class="block relative">
+                                        <input type="radio" name="actif" value="Soin Purifiant & Éclat" data-inci=", Niacinamide">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Purifiant & Éclat</h4>
+                                                <p class="text-xs text-gray-500">Niacinamide pour lisser et unifier le teint.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Étape 3 -->
+                            <div id="step-3" class="w-full hidden">
+                                <h3 class="font-serif text-3xl text-circe-khaki mb-2">Le Parfum</h3>
+                                <p class="font-sans text-sm text-circe-khaki-light mb-8">L'empreinte olfactive de votre gel douche.</p>
+                                <div class="space-y-4">
+                                    <label class="block relative">
+                                        <input type="radio" name="parfum" value="Infusion Vanille Chaude" data-inci=", Vanilla Planifolia Extract">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Vanille Chaude</h4>
+                                                <p class="text-xs text-gray-500">Note gourmande et élégante issue de gousses BIO.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                    <label class="block relative">
+                                        <input type="radio" name="parfum" value="Sillage Fleur de Coton" data-inci=", Parfum (Cotton Flower)">
+                                        <div class="option-card p-5 rounded-sm flex items-center justify-between">
+                                            <div class="pr-4">
+                                                <h4 class="font-serif text-xl font-semibold mb-1">Fleur de Coton</h4>
+                                                <p class="text-xs text-gray-500">Douce, poudrée et délicatement musquée.</p>
+                                            </div>
+                                            <div class="radio-indicator flex-shrink-0"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Étape 4 -->
+                            <div id="step-4" class="w-full hidden">
+                                <h3 class="font-serif text-3xl text-circe-khaki mb-2">Votre Signature</h3>
+                                <p class="font-sans text-sm text-circe-khaki-light mb-6">À qui est destinée cette création sur-mesure ?</p>
+                                
+                                <div class="mb-8">
+                                    <input type="text" id="client-name" placeholder="Tapez un prénom (ex: Annette)" class="input-premium w-full text-xl font-serif text-circe-khaki placeholder-gray-300 bg-transparent" maxlength="15">
+                                </div>
+
+                                <div class="bg-white p-6 border border-circe-gray shadow-sm">
+                                    <h4 class="text-xs tracking-widest uppercase font-semibold text-circe-khaki mb-4 border-b border-gray-100 pb-2">Récapitulatif</h4>
+                                    <ul class="text-sm space-y-2 text-circe-khaki-light">
+                                        <li class="flex justify-between"><span>Format:</span> <span>Flacon Verre 150ml</span></li>
+                                        <li class="flex justify-between"><span>Texture:</span> <span id="sum-base" class="font-medium text-right ml-4">-</span></li>
+                                        <li class="flex justify-between"><span>Propriété:</span> <span id="sum-actif" class="font-medium text-right ml-4">-</span></li>
+                                        <li class="flex justify-between"><span>Parfum:</span> <span id="sum-parfum" class="font-medium text-right ml-4">-</span></li>
+                                    </ul>
+                                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                        <span class="font-serif text-xl font-semibold">Total</span>
+                                        <span class="font-serif text-2xl font-bold text-circe-gold">30,00 €</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons actions -->
+                        <div class="mt-8 flex justify-between items-center pt-6">
+                            <button id="btn-prev" class="text-xs md:text-sm font-semibold tracking-widest uppercase text-gray-400 hover:text-circe-khaki transition-colors invisible flex items-center">
+                                <i class="ph ph-arrow-left mr-1"></i> Retour
+                            </button>
+                            
+                            <button id="btn-next" class="bg-circe-khaki text-white px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-semibold tracking-widest uppercase hover:bg-circe-dark transition-colors shadow-luxury flex items-center">
+                                Continuer <i class="ph ph-arrow-right ml-2"></i>
+                            </button>
+                            
+                            <button id="btn-cart" class="bg-circe-khaki text-white px-6 md:px-8 py-4 text-xs md:text-sm font-semibold tracking-widest uppercase hover:bg-circe-dark transition-colors shadow-luxury flex items-center hidden w-full justify-center">
+                                Ajouter au panier <i class="ph ph-bag ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4 : Témoignages (Preuve sociale) -->
+        <section id="temoignages" class="w-full bg-circe-khaki py-24 px-6 md:px-12 text-circe-cream">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-serif text-3xl md:text-5xl mb-4 text-circe-cream">Leur peau, leurs règles.</h2>
+                    <p class="font-sans text-xs md:text-sm text-circe-gray opacity-80 tracking-widest uppercase">Elles ont trouvé leur rituel</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Avis 1 -->
+                    <div class="border border-circe-cream/20 p-8 flex flex-col justify-between hover:bg-circe-cream/5 transition-colors duration-300">
+                        <div>
+                            <div class="flex text-circe-gold mb-4 text-sm">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                            <p class="font-sans text-sm leading-relaxed mb-6 italic opacity-90">"Enfin un gel douche qui ne me laisse pas la peau qui tire après le rinçage. L'odeur de vanille est divine et mon eczéma s'est calmé en quelques jours."</p>
+                        </div>
+                        <div class="border-t border-circe-cream/10 pt-4 mt-4">
+                            <p class="font-serif text-lg font-semibold">Cuvée de Sophie</p>
+                            <p class="font-sans text-[10px] tracking-widest uppercase opacity-60">Base Douce • Hydratation</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Avis 2 -->
+                    <div class="border border-circe-cream/20 p-8 flex flex-col justify-between hover:bg-circe-cream/5 transition-colors duration-300">
+                        <div>
+                            <div class="flex text-circe-gold mb-4 text-sm">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                            <p class="font-sans text-sm leading-relaxed mb-6 italic opacity-90">"Le concept sur-mesure est génial. Le flacon en verre fait tellement chic dans ma salle de bain que je l'expose comme un grand parfum."</p>
+                        </div>
+                        <div class="border-t border-circe-cream/10 pt-4 mt-4">
+                            <p class="font-serif text-lg font-semibold">Cuvée de Marie</p>
+                            <p class="font-sans text-[10px] tracking-widest uppercase opacity-60">Base Exfoliante • Éclat</p>
+                        </div>
+                    </div>
+
+                    <!-- Avis 3 -->
+                    <div class="border border-circe-cream/20 p-8 flex flex-col justify-between hover:bg-circe-cream/5 transition-colors duration-300">
+                        <div>
+                            <div class="flex text-circe-gold mb-4 text-sm">
+                                <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                            </div>
+                            <p class="font-sans text-sm leading-relaxed mb-6 italic opacity-90">"Fini les produits de pharmacie tristes ! J'ai enfin l'impression de prendre soin de moi, de me faire un vrai cadeau. Texture parfaite."</p>
+                        </div>
+                        <div class="border-t border-circe-cream/10 pt-4 mt-4">
+                            <p class="font-serif text-lg font-semibold">Cuvée de Léa</p>
+                            <p class="font-sans text-[10px] tracking-widest uppercase opacity-60">Base Douce • Purifiant</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER : Liens & Newsletter -->
+    <footer class="w-full bg-circe-dark text-circe-cream border-t border-circe-cream/10 pt-20 pb-10 px-6 md:px-12 mt-auto">
+        <div class="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            
+            <!-- Marque -->
+            <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                <h2 class="font-serif text-3xl tracking-[0.2em] font-semibold mb-4 text-circe-cream">CIRCÉ</h2>
+                <p class="font-sans text-xs text-gray-400 leading-relaxed mb-6">Cosmétique sur-mesure pour épidermes capricieux. Conçu à Paris, fabriqué en France.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full border border-circe-cream/20 flex items-center justify-center hover:bg-circe-gold hover:border-circe-gold transition-colors">
+                        <i class="ph ph-instagram-logo text-xl"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-circe-cream/20 flex items-center justify-center hover:bg-circe-gold hover:border-circe-gold transition-colors">
+                        <i class="ph ph-tiktok-logo text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Liens -->
+            <div>
+                <h4 class="font-sans text-xs tracking-widest uppercase font-semibold text-circe-gold mb-6">Explorer</h4>
+                <ul class="space-y-3 font-sans text-sm text-gray-400">
+                    <li><a href="#hero-gallery" class="hover:text-circe-cream transition-colors">La Maison</a></li>
+                    <li><a href="#sur-mesure" class="hover:text-circe-cream transition-colors">Créer ma cuvée</a></li>
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Nos ingrédients</a></li>
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Foire aux questions</a></li>
+                </ul>
+            </div>
+
+            <!-- Légal -->
+            <div>
+                <h4 class="font-sans text-xs tracking-widest uppercase font-semibold text-circe-gold mb-6">Informations</h4>
+                <ul class="space-y-3 font-sans text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Contactez-nous</a></li>
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Livraison & Retours</a></li>
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Conditions Générales</a></li>
+                    <li><a href="#" class="hover:text-circe-cream transition-colors">Politique de confidentialité</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                <h4 class="font-sans text-xs tracking-widest uppercase font-semibold text-circe-gold mb-6">Rejoindre le cercle</h4>
+                <p class="font-sans text-xs text-gray-400 leading-relaxed mb-4">Inscrivez-vous pour recevoir nos actualités et vos invitations privées.</p>
+                <form class="flex flex-col gap-3" onsubmit="event.preventDefault(); showToast('Inscription réussie !', 'ph-envelope-simple-open');">
+                    <input type="email" placeholder="Votre adresse email" required class="bg-transparent border border-circe-cream/20 px-4 py-3 text-sm focus:outline-none focus:border-circe-gold transition-colors text-circe-cream placeholder-gray-500">
+                    <button type="submit" class="bg-circe-cream text-circe-dark px-4 py-3 text-xs font-semibold tracking-widest uppercase hover:bg-circe-gold hover:text-white transition-colors">
+                        S'inscrire
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-circe-cream/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center">
+            <p class="font-sans text-[10px] tracking-widest uppercase text-gray-500">© 2026 CIRCÉ PARIS. Tous droits réservés.</p>
+            <div class="flex gap-4 text-2xl text-gray-500">
+                <i class="ph ph-stripe-logo"></i>
+                <i class="ph ph-visa-logo"></i>
+                <i class="ph ph-mastercard-logo"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PANIER (Overlay & Drawer) -->
+    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/30 z-[90] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-circe-cream shadow-2xl z-[100] transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-circe-gray flex justify-between items-center bg-white">
+            <h2 class="font-serif text-2xl text-circe-khaki">Votre Panier</h2>
+            <button id="close-cart" class="text-circe-khaki hover:text-circe-gold transition-colors">
+                <i class="ph ph-x text-2xl"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4 flex flex-col bg-circe-cream">
+            <div class="text-center text-sm text-circe-khaki-light mt-10" id="empty-cart-msg">Votre panier est vide.</div>
+        </div>
+        <div class="p-6 border-t border-circe-gray bg-white">
+            <div class="flex justify-between font-serif text-xl mb-4 text-circe-khaki">
+                <span>Total</span>
+                <span id="cart-total" class="font-bold text-circe-gold">0,00 €</span>
+            </div>
+            <button class="w-full bg-circe-khaki text-white py-4 text-sm font-semibold tracking-widest uppercase hover:bg-circe-dark transition-colors shadow-luxury">
+                Procéder au paiement
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-circe-dark text-white px-6 py-4 rounded-sm shadow-2xl z-[110] flex items-center gap-3">
+        <i class="ph ph-info text-circe-gold text-xl" id="toast-icon"></i>
+        <span id="toast-message" class="text-sm font-sans tracking-wide whitespace-nowrap">Message</span>
+    </div>
+
+    <script>
+        const state = { step: 1, maxSteps: 4, base: '', actif: '', parfum: '', name: '', inci: { base: '', actif: '', parfum: '' } };
+        let cart = []; 
+
+        const btnNext = document.getElementById('btn-next'), btnPrev = document.getElementById('btn-prev'), btnCart = document.getElementById('btn-cart'), nameInput = document.getElementById('client-name');
+        const openCartBtn = document.getElementById('open-cart-btn'), closeCartBtn = document.getElementById('close-cart'), cartDrawer = document.getElementById('cart-drawer'), cartOverlay = document.getElementById('cart-drawer-overlay'), cartItemsContainer = document.getElementById('cart-items'), cartTotal = document.getElementById('cart-total'), emptyCartMsg = document.getElementById('empty-cart-msg'), cartCount = document.getElementById('cart-count');
+        const pName = document.getElementById('preview-name'), pBase = document.getElementById('preview-base'), pActif = document.getElementById('preview-actif'), pParfum = document.getElementById('preview-parfum'), pInci = document.getElementById('preview-inci'), sBase = document.getElementById('sum-base'), sActif = document.getElementById('sum-actif'), sParfum = document.getElementById('sum-parfum');
+
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const name = e.target.name, value = e.target.value;
+                state[name] = value; state.inci[name] = e.target.dataset.inci;
+                if(name === 'base') pBase.textContent = value;
+                if(name === 'actif') pActif.textContent = value;
+                if(name === 'parfum') pParfum.textContent = value;
+                updateINCI();
+            });
+        });
+
+        nameInput.addEventListener('input', (e) => {
+            nameInput.classList.remove('input-error'); 
+            let val = e.target.value.toUpperCase();
+            state.name = val; pName.textContent = val ? val : '...';
+        });
+
+        function updateINCI() {
+            let fullInci = 'INCI: ' + (state.inci.base || 'Aqua, Base Neutre');
+            if(state.inci.actif) fullInci += state.inci.actif;
+            if(state.inci.parfum) fullInci += state.inci.parfum;
+            fullInci += ', Citric Acid, Potassium Sorbate.'; pInci.textContent = fullInci;
+        }
+
+        function updateUI() {
+            for(let i = 1; i <= state.maxSteps; i++) {
+                const el = document.getElementById(`step-${i}`), navEl = document.getElementById(`nav-step-${i}`);
+                el.classList.add('hidden'); el.classList.remove('fade-in');
+                navEl.className = "pb-1 border-b-2 border-transparent text-gray-300";
+                if(i < state.step) navEl.className = "pb-1 border-b-2 border-transparent text-circe-gold";
+                else if(i === state.step) navEl.className = "text-circe-khaki font-bold border-b-2 border-circe-khaki pb-1";
+            }
+            const currentEl = document.getElementById(`step-${state.step}`);
+            currentEl.classList.remove('hidden'); setTimeout(() => currentEl.classList.add('fade-in'), 10);
+            btnPrev.classList.toggle('invisible', state.step === 1);
+            if (state.step === state.maxSteps) {
+                btnNext.classList.add('hidden'); btnCart.classList.remove('hidden');
+                sBase.textContent = state.base; sActif.textContent = state.actif; sParfum.textContent = state.parfum;
+            } else {
+                btnNext.classList.remove('hidden'); btnCart.classList.add('hidden');
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (state.step === 1 && !state.base) return showToast("Veuillez choisir une Texture.", "ph-warning");
+            if (state.step === 2 && !state.actif) return showToast("Veuillez choisir une Propriété.", "ph-warning");
+            if (state.step === 3 && !state.parfum) return showToast("Veuillez choisir un Parfum.", "ph-warning");
+            if(state.step < state.maxSteps) { state.step++; updateUI(); }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if(state.step > 1) { state.step--; updateUI(); }
+        });
+
+        function toggleCart() {
+            if(cartDrawer.classList.contains('translate-x-full')) {
+                cartOverlay.classList.remove('hidden'); setTimeout(() => cartOverlay.classList.remove('opacity-0'), 10);
+                cartDrawer.classList.remove('translate-x-full'); renderCart();
+            } else {
+                cartOverlay.classList.add('opacity-0'); cartDrawer.classList.add('translate-x-full');
+                setTimeout(() => cartOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        openCartBtn.addEventListener('click', toggleCart); closeCartBtn.addEventListener('click', toggleCart); cartOverlay.addEventListener('click', toggleCart);
+
+        function renderCart() {
+            Array.from(cartItemsContainer.children).forEach(child => { if(child.id !== 'empty-cart-msg') child.remove(); });
+            if(cart.length === 0) {
+                emptyCartMsg.classList.remove('hidden'); cartTotal.textContent = '0,00 €'; cartCount.textContent = '0'; return;
+            }
+            emptyCartMsg.classList.add('hidden'); let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price; const itemEl = document.createElement('div');
+                itemEl.className = 'bg-white p-5 border border-circe-gray relative slide-up shadow-sm';
+                itemEl.innerHTML = `
+                    <h4 class="font-serif text-lg text-circe-khaki mb-2">Cuvée de ${item.name}</h4>
+                    <p class="text-xs text-circe-khaki-light mb-1 leading-relaxed">• ${item.base} <br> • ${item.actif} <br> • ${item.parfum}</p>
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-circe-gray/50">
+                        <span class="font-serif font-bold text-circe-gold text-lg">${item.price.toFixed(2).replace('.', ',')} €</span>
+                        <button onclick="removeFromCart(${index})" class="text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors flex items-center"><i class="ph ph-trash mr-1 text-sm"></i>Retirer</button>
+                    </div>`;
+                cartItemsContainer.appendChild(itemEl);
+            });
+            cartTotal.textContent = total.toFixed(2).replace('.', ',') + ' €'; cartCount.textContent = cart.length;
+        }
+
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1); renderCart(); cartCount.textContent = cart.length;
+            if(cart.length === 0) cartCount.classList.remove('bg-circe-gold');
+        }
+
+        btnCart.addEventListener('click', () => {
+            if(!state.name || state.name.trim() === '') {
+                showToast("Veuillez inscrire un prénom.", "ph-warning"); nameInput.classList.add('input-error'); nameInput.focus(); return;
+            }
+            cart.push({ name: state.name, base: state.base, actif: state.actif, parfum: state.parfum, price: 30.00 });
+            cartCount.classList.add('bg-circe-gold', 'pop-in'); setTimeout(() => cartCount.classList.remove('pop-in'), 300);
+            toggleCart(); showToast("Produit ajouté avec succès.", "ph-check-circle"); setTimeout(resetForm, 1000);
+        });
+
+        function resetForm() {
+            state.step = 1; state.name = ''; state.base = ''; state.actif = ''; state.parfum = '';
+            nameInput.value = ''; pName.textContent = '...';
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            pBase.textContent = 'Sélectionnez une base'; pActif.textContent = 'Sélectionnez un actif'; pParfum.textContent = 'Sélectionnez un parfum';
+            updateUI(); updateINCI();
+        }
+
+        function showToast(message, iconClass = "ph-info") {
+            const toast = document.getElementById('toast'), msgEl = document.getElementById('toast-message'), iconEl = document.getElementById('toast-icon');
+            msgEl.textContent = message; iconEl.className = `ph ${iconClass} text-circe-gold text-xl`;
+            toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
